@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/app_state_provider.dart';
+import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin_dashboard_screen.dart';
 import 'screens/driver_dashboard_screen.dart';
@@ -67,8 +68,9 @@ class LogisticsApp extends StatelessWidget {
         ),
         fontFamily: 'Roboto',
       ),
-      initialRoute: '/login',
+      initialRoute: '/splash',
       routes: {
+        '/splash': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/admin_dashboard': (context) => const AdminDashboardScreen(),
         '/driver_dashboard': (context) => const DriverDashboardScreen(),
