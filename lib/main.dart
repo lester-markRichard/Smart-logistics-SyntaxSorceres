@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/app_state_provider.dart';
+import 'providers/language_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/admin_dashboard_screen.dart';
@@ -41,6 +42,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppStateProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
       child: const LogisticsApp(),
     ),

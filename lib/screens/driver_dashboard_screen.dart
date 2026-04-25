@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
+import '../providers/language_provider.dart';
 import '../models/logistics_models.dart';
 
 class DriverDashboardScreen extends StatefulWidget {
@@ -18,16 +19,25 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final langProvider = Provider.of<LanguageProvider>(context);
     final user = Provider.of<AppStateProvider>(context).currentUser;
     final driverName = user?.name ?? 'Driver';
     final truckNumber = user?.truckNumber ?? 'Unknown Truck';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Driver Hub', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(langProvider.translate('driver_dashboard'), style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         actions: [
+          TextButton.icon(
+            onPressed: () => langProvider.toggleLanguage(),
+            icon: const Icon(Icons.language, color: Colors.white),
+            label: Text(
+              langProvider.isHindi ? 'English' : 'हिंदी',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
@@ -45,7 +55,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back, $driverName',
+                    '${langProvider.translate('welcome_back')}, $driverName',
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

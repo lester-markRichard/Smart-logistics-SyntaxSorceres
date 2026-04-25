@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
+import '../providers/language_provider.dart';
 import '../models/logistics_models.dart';
 import '../services/gemini_service.dart';
 
@@ -371,6 +372,7 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
   Widget build(BuildContext context) {
     if (_needsDestination) return _buildQuickStart();
     return Consumer<AppStateProvider>(builder: (ctx, prov, _) {
+      final langProvider = Provider.of<LanguageProvider>(ctx);
       final user = prov.currentUser;
       Trip? trip;
       Vehicle? vehicle;
@@ -438,7 +440,7 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
                               children: [
                                 Text(
                                   _isSlotAvailable 
-                                      ? '✅ Status: ${prov.assignedSlot} Available' 
+                                      ? '✅ ${langProvider.translate('status')}: ${prov.assignedSlot} Available' 
                                       : '📍 Live Status: 3rd in line at Distribution Centre 3, ${prov.assignedSlot}',
                                   style: TextStyle(
                                     color: _isSlotAvailable ? Colors.greenAccent : Colors.white,
@@ -449,7 +451,7 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
                                 const SizedBox(height: 4),
                                 if (_waitTimeMins > 0)
                                   Text(
-                                    'Est. Wait: $_waitTimeMins mins',
+                                    '${langProvider.translate('est_wait')}: $_waitTimeMins mins',
                                     style: TextStyle(
                                       color: Colors.white.withOpacity(0.6),
                                       fontSize: 13,
@@ -498,7 +500,7 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () => _showRescheduleSheet(context),
                     icon: const Icon(Icons.warning_amber_rounded),
-                    label: const Text('🚨 Report Delay / Issue'),
+                    label: Text('🚨 ${langProvider.translate('report_delay')}'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                       foregroundColor: Colors.white,
@@ -512,7 +514,7 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
                 // Finish
                 SizedBox(width: double.infinity, child: ElevatedButton.icon(
                   onPressed: _finishTrip,
-                  icon: const Icon(Icons.flag), label: const Text('Complete / Finish Trip'),
+                  icon: const Icon(Icons.flag), label: Text(langProvider.translate('complete_trip')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).scaffoldBackgroundColor,

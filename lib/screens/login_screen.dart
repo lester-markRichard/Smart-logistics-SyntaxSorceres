@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
+import '../providers/language_provider.dart';
 import '../models/logistics_models.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -65,6 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final langProvider = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
       body: Row(
         children: [
@@ -129,8 +132,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: TextButton.icon(
+                            onPressed: () => langProvider.toggleLanguage(),
+                            icon: const Icon(Icons.language, color: Colors.white),
+                            label: Text(
+                              langProvider.isHindi ? 'English' : 'हिंदी',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
                         Text(
-                          'Welcome back',
+                          langProvider.translate('welcome_back'),
                           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -215,9 +230,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             elevation: 0,
                           ),
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
+                          child: Text(
+                            langProvider.translate('sign_in'),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF0F172A),
