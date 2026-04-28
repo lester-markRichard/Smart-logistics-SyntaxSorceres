@@ -8,6 +8,7 @@ import '../providers/app_state_provider.dart';
 import '../providers/language_provider.dart';
 import '../models/logistics_models.dart';
 import '../services/sarvam_service.dart';
+import 'driver_chatbot_screen.dart';
 
 const List<LatLng> _kRoute = [
   LatLng(19.076, 72.877), LatLng(19.065, 72.881), LatLng(19.050, 72.873),
@@ -233,8 +234,6 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
         currentPrediction = "Telemetry indicates a severe localized storm front 15km ahead on NH48. High probability of surface flooding and reduced visibility. Current trajectory intersects the high-risk zone in approximately 12 minutes.";
         currentStrategy = "Initiating immediate velocity reduction protocol. Decrease speed by 23 km/h to maintain optimal tire traction and increase following distance. Continue monitoring for potential reroute triggers.";
       });
-      _showSnack('⚠️ RISK DETECTED: Severe Weather Ahead. Reducing speed.',
-          Colors.orangeAccent, Colors.black);
     }
     // Pre-Cognitive Reroute: triggers at 0.47 (slightly BEFORE map reroute at 0.50)
     if (progress >= 0.47 && !_preRerouteTriggered) {
@@ -560,6 +559,17 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
               ]),
             ),
           ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DriverChatbotScreen()),
+            );
+          },
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          child: const Icon(Icons.chat_bubble, color: Color(0xFF0F172A)),
         ),
       );
     });

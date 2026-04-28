@@ -22,7 +22,7 @@ Future<void> main() async {
   // 1. THIS IS REQUIRED if you have 'await' before runApp!
   WidgetsFlutterBinding.ensureInitialized(); 
 
-  await dotenv.load(fileName: '.env');
+  await dotenv.load(fileName: 'config.env');
   
   // 2. The AI Test
   final String apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
