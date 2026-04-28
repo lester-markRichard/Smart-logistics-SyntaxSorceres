@@ -27,7 +27,7 @@ Future<void> main() async {
   // 2. The AI Test
   final String apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
   // Use 1.5-flash, gemini-pro is legacy and might throw errors!
-  final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey); 
+  final model = GenerativeModel(model: 'gemini-1.5-flash', apiKey: apiKey); 
   final content = [Content.text('Write a short sentence about a magic truck.')];
   
   try {

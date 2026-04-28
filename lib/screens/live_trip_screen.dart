@@ -72,6 +72,12 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
   bool _riskShown     = false;
   bool _rerouteShown  = false;
   bool _rerouteActive = false;
+  
+  // ── Phase 44: Two-Panel AI UI & Pre-Cognitive Reroute ───────────────────
+  String currentPrediction = "Monitoring route conditions...";
+  String currentStrategy = "Awaiting initial telemetry...";
+  bool _weatherCleared = false;
+  bool _preRerouteTriggered = false;
 
   // Micro-steps (lerped points) + ETA state
   late List<LatLng> _micro;
@@ -220,16 +226,35 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
           bearing: _microBearing(nextStep)),
     ));
 
-    // 7. Scripted snackbars
+    // 7. Scripted snackbars and Mocked Strategy
     if (progress >= 0.30 && !_riskShown) {
       _riskShown = true;
+      setState(() {
+        currentPrediction = "Telemetry indicates a severe localized storm front 15km ahead on NH48. High probability of surface flooding and reduced visibility. Current trajectory intersects the high-risk zone in approximately 12 minutes.";
+        currentStrategy = "Initiating immediate velocity reduction protocol. Decrease speed by 23 km/h to maintain optimal tire traction and increase following distance. Continue monitoring for potential reroute triggers.";
+      });
       _showSnack('⚠️ RISK DETECTED: Severe Weather Ahead. Reducing speed.',
           Colors.orangeAccent, Colors.black);
+    }
+    // Pre-Cognitive Reroute: triggers at 0.47 (slightly BEFORE map reroute at 0.50)
+    if (progress >= 0.47 && !_preRerouteTriggered) {
+      _preRerouteTriggered = true;
+      setState(() {
+        currentPrediction = "Critical incident detected: Major multi-vehicle collision reported near Lonavala ghat section. Traffic velocity has dropped to 0 km/h. Estimated clearance time exceeds 3 hours, causing a complete gridlock on the primary route.";
+        currentStrategy = "Calculated optimal alternative: Diverting to the Old Mumbai-Pune Highway. This will add approximately 45 minutes to the ETA but guarantees continuous movement. Standby for updated navigation coordinates.";
+      });
     }
     if (progress >= 0.50 && !_rerouteShown) {
       _rerouteShown = true;
       _showSnack('🔄 REROUTING: Faster alternate highway found — saving 8 km.',
           Colors.deepOrange, Colors.white);
+    }
+    if (progress >= 0.65 && !_weatherCleared) {
+      _weatherCleared = true;
+      setState(() {
+        currentPrediction = "Vehicle has successfully bypassed the congested zone. Current route parameters are nominal. Weather conditions have stabilized with optimal visibility and dry road surfaces for the remainder of the journey.";
+        currentStrategy = "Restore standard operating velocity. Resume standard power consumption profile. Recalculating final arrival time for Distribution Centre 3. Proceed with standard logistics protocols.";
+      });
     }
   }
 
@@ -474,7 +499,7 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
                 _telemetry(context, etaDisplay, progress),
                 const SizedBox(height: 10),
                 // Map + HUD
-                Expanded(child: Stack(children: [
+                Expanded(flex: 3, child: Stack(children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: GoogleMap(
@@ -491,38 +516,47 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
                   Positioned(bottom: 0, left: 0, right: 0, child: _progressBar(progress)),
                 ])),
                 const SizedBox(height: 10),
-                // AI alert
-                _aiCard(aiAlert),
-                const SizedBox(height: 10),
-                // 🚨 PHASE 33: Massive Delay Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showRescheduleSheet(context),
-                    icon: const Icon(Icons.warning_amber_rounded),
-                    label: Text('🚨 ${langProvider.translate('report_delay')}'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Expanded(
+                  flex: 2,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Two-Panel AI Copilot
+                        _aiPanels(currentPrediction, currentStrategy),
+                        const SizedBox(height: 10),
+                        // 🚨 PHASE 33: Massive Delay Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () => _showRescheduleSheet(context),
+                            icon: const Icon(Icons.warning_amber_rounded),
+                            label: Text('🚨 ${langProvider.translate('report_delay')}'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Finish
+                        SizedBox(width: double.infinity, child: ElevatedButton.icon(
+                          onPressed: _finishTrip,
+                          icon: const Icon(Icons.flag), label: Text(langProvider.translate('complete_trip')),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).scaffoldBackgroundColor,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        )),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                // Finish
-                SizedBox(width: double.infinity, child: ElevatedButton.icon(
-                  onPressed: _finishTrip,
-                  icon: const Icon(Icons.flag), label: Text(langProvider.translate('complete_trip')),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                )),
               ]),
             ),
           ),
@@ -617,21 +651,59 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
     );
   }
 
-  Widget _aiCard(String text) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: Colors.orangeAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.orangeAccent.withOpacity(0.35))),
-      child: Row(children: [
-        const Icon(Icons.auto_awesome, size: 26, color: Colors.orangeAccent),
-        const SizedBox(width: 14),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('LIVE AI STRATEGY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold,
-              color: Colors.orangeAccent, letterSpacing: 1.2)),
-          const SizedBox(height: 3),
-          Text(text, style: const TextStyle(fontSize: 13, color: Colors.white, height: 1.4)),
-        ])),
-      ]),
+  Widget _aiPanels(String prediction, String strategy) {
+    return Column(
+      children: [
+        // Panel 1: Prediction
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+              color: Colors.orangeAccent.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.orangeAccent.withOpacity(0.3))),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, size: 18, color: Colors.orangeAccent),
+                  SizedBox(width: 8),
+                  Text('⚠️ AI PREDICTION / ANALYSIS',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.orangeAccent, letterSpacing: 1.1)),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(prediction, style: const TextStyle(fontSize: 13, color: Colors.white, height: 1.5)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        // Panel 2: Strategy
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+              color: Colors.greenAccent.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.greenAccent.withOpacity(0.3))),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.lightbulb_outline, size: 18, color: Colors.greenAccent),
+                  SizedBox(width: 8),
+                  Text('💡 STRATEGY RECOMMENDED',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.greenAccent, letterSpacing: 1.1)),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(strategy, style: const TextStyle(fontSize: 13, color: Colors.white, height: 1.5)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

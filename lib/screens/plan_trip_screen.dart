@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../models/logistics_models.dart';
 import '../services/gemini_service.dart';
+import '../providers/language_provider.dart';
 
 class PlanTripScreen extends StatefulWidget {
   const PlanTripScreen({super.key});
@@ -119,9 +120,10 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final langProvider = Provider.of<LanguageProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plan a Trip', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(langProvider.translate('plan_trip_title'), style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
       ),
@@ -145,24 +147,24 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'TRIP DETAILS',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Colors.white54),
+                          Text(
+                            langProvider.translate('trip_details'),
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Colors.white54),
                           ),
                           const SizedBox(height: 32),
                           Row(
                             children: [
-                              Expanded(child: _buildTextField(_dateController, 'Date (e.g., 2026-05-12)', Icons.date_range)),
+                              Expanded(child: _buildTextField(_dateController, langProvider.translate('date_label'), Icons.date_range)),
                               const SizedBox(width: 24),
-                              Expanded(child: _buildTextField(_timeController, 'Desired Arrival Time (e.g., 14:00)', Icons.access_time)),
+                              Expanded(child: _buildTextField(_timeController, langProvider.translate('arrival_time_label'), Icons.access_time)),
                             ],
                           ),
                           const SizedBox(height: 24),
                           Row(
                             children: [
-                              Expanded(child: _buildTextField(_startLocationController, 'Start Location', Icons.my_location)),
+                              Expanded(child: _buildTextField(_startLocationController, langProvider.translate('start_location'), Icons.my_location)),
                               const SizedBox(width: 24),
-                              Expanded(child: _buildTextField(_endLocationController, 'End Location', Icons.location_on)),
+                              Expanded(child: _buildTextField(_endLocationController, langProvider.translate('end_location'), Icons.location_on)),
                             ],
                           ),
                           const SizedBox(height: 40),
@@ -175,7 +177,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                                   : const Icon(Icons.auto_awesome),
                               label: Text(_isLoading
                                   ? 'Gemini AI Analyzing Route...'
-                                  : (_strategyGenerated ? '✓ Strategy Generated' : 'Generate Strategy')),
+                                  : (_strategyGenerated ? '✓ Strategy Generated' : langProvider.translate('generate_strategy'))),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).colorScheme.primary,
                                 foregroundColor: Theme.of(context).scaffoldBackgroundColor,

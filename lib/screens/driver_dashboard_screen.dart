@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../providers/language_provider.dart';
 import '../models/logistics_models.dart';
+import 'driver_chatbot_screen.dart';
 
 class DriverDashboardScreen extends StatefulWidget {
   const DriverDashboardScreen({super.key});
@@ -72,8 +73,8 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
                       Expanded(
                         child: _buildActionCard(
                           context,
-                          title: 'Plan a Trip',
-                          subtitle: 'AI-assisted route strategy and scheduling.',
+                          title: langProvider.translate('plan_trip_title'),
+                          subtitle: langProvider.translate('plan_trip_sub'),
                           icon: Icons.calendar_today_outlined,
                           color: Theme.of(context).colorScheme.secondary,
                           onTap: () => Navigator.pushNamed(context, '/plan_trip'),
@@ -83,8 +84,8 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
                       Expanded(
                         child: _buildActionCard(
                           context,
-                          title: 'Start Now',
-                          subtitle: 'Jump into your active trip navigation.',
+                          title: langProvider.translate('start_now_title'),
+                          subtitle: langProvider.translate('start_now_sub'),
                           icon: Icons.play_arrow_rounded,
                           color: Theme.of(context).colorScheme.primary,
                           onTap: () => _startNow(context),
@@ -94,8 +95,8 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
                       Expanded(
                         child: _buildActionCard(
                           context,
-                          title: 'Book Slot',
-                          subtitle: 'Reserve warehouse unloading or parking slots.',
+                          title: langProvider.translate('book_slot_title'),
+                          subtitle: langProvider.translate('book_slot_sub'),
                           icon: Icons.warehouse_outlined,
                           color: Colors.purpleAccent,
                           onTap: () => Navigator.pushNamed(context, '/slot_booking'),
@@ -108,6 +109,16 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DriverChatbotScreen()),
+          );
+        },
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.chat_bubble, color: Color(0xFF0F172A)),
       ),
     );
   }

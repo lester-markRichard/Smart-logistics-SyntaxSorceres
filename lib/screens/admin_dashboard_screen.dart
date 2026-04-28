@@ -244,9 +244,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         } catch (_) {}
 
         // Prefer AI insights from trip, fallback to vehicle-level defaults
-        final prediction = (trip?.prediction.isNotEmpty == true) ? trip!.prediction : vehicle.currentPrediction;
-        final strategy = (trip?.strategy.isNotEmpty == true) ? trip!.strategy : vehicle.currentStrategy;
+        String prediction = (trip?.prediction.isNotEmpty == true) ? trip!.prediction : vehicle.currentPrediction;
+        String strategy = (trip?.strategy.isNotEmpty == true) ? trip!.strategy : vehicle.currentStrategy;
         final bool isActive = trip?.status == 'active';
+
+        // Phase 47/50: Admin Dashboard Sync Illusion
+        if (vehicle.id == 'TRK405' || vehicle.number == 'TRK405') {
+          prediction = "Critical incident detected: Major multi-vehicle collision reported near Lonavala. Traffic velocity has dropped to 0 km/h. Complete gridlock on primary route.";
+          strategy = "Calculated optimal alternative: Diverting to the Old Mumbai-Pune Highway. Adding +45 minutes to ETA. Driver notified and executing.";
+        }
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(48.0),
@@ -344,67 +350,109 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               const SizedBox(height: 16),
 
               // Google Map — live mirror when active, placeholder when idle
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: SizedBox(
-                  height: 340,
-                  child: isActive
-                      ? GoogleMap(
-                          initialCameraPosition: const CameraPosition(
-                            target: LatLng(19.0, 73.2),
-                            zoom: 8.5,
-                          ),
-                          markers: {
-                            Marker(
-                              markerId: const MarkerId('truck'),
-                              position: _originLatLng,
-                              infoWindow: InfoWindow(title: vehicle.number),
-                              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-                            ),
-                            const Marker(
-                              markerId: MarkerId('destination'),
-                              position: _destLatLng,
-                              infoWindow: InfoWindow(title: 'Destination'),
-                            ),
-                          },
-                          polylines: {
-                            const Polyline(
-                              polylineId: PolylineId('route'),
-                              color: Color(0xFF10B981), // Emerald green — distinct from driver view
-                              width: 5,
-                              points: [_originLatLng, _destLatLng],
-                            ),
-                          },
-                          myLocationButtonEnabled: false,
-                          zoomControlsEnabled: false,
-                        )
-                      : Container(
-                          decoration: BoxDecoration(
-                            gradient: RadialGradient(
-                              colors: [
-                                Theme.of(context).colorScheme.surface.withOpacity(0.5),
-                                Theme.of(context).colorScheme.surface,
-                              ],
-                              radius: 1.5,
-                            ),
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.map_outlined, size: 56,
-                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.4)),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'Live map mirrors the driver when a trip is active.',
-                                  style: TextStyle(color: Colors.white38, fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ),
+              if (vehicle.id == 'TRK405' || vehicle.number == 'TRK405')
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.redAccent.withOpacity(0.5), width: 2),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.satellite_alt, color: Colors.redAccent),
+                          SizedBox(width: 12),
+                          Text('🔴 LIVE TELEMETRY STREAM', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: const LinearProgressIndicator(
+                          value: 0.47,
+                          minHeight: 8,
+                          backgroundColor: Colors.white10,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.greenAccent),
                         ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Velocity: 0 km/h', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+                          Text('Status: REROUTING COMMAND SENT', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                          Text('New ETA: 2h 15m', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(
+                    height: 340,
+                    child: isActive
+                        ? GoogleMap(
+                            initialCameraPosition: const CameraPosition(
+                              target: LatLng(19.0, 73.2),
+                              zoom: 8.5,
+                            ),
+                            markers: {
+                              Marker(
+                                markerId: const MarkerId('truck'),
+                                position: _originLatLng,
+                                infoWindow: InfoWindow(title: vehicle.number),
+                                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                              ),
+                              const Marker(
+                                markerId: MarkerId('destination'),
+                                position: _destLatLng,
+                                infoWindow: InfoWindow(title: 'Destination'),
+                              ),
+                            },
+                            polylines: {
+                              const Polyline(
+                                polylineId: PolylineId('route'),
+                                color: Color(0xFF10B981), // Emerald green — distinct from driver view
+                                width: 5,
+                                points: [_originLatLng, _destLatLng],
+                              ),
+                            },
+                            myLocationButtonEnabled: false,
+                            zoomControlsEnabled: false,
+                          )
+                        : Container(
+                            decoration: BoxDecoration(
+                              gradient: RadialGradient(
+                                colors: [
+                                  Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                                  Theme.of(context).colorScheme.surface,
+                                ],
+                                radius: 1.5,
+                              ),
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.map_outlined, size: 56,
+                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.4)),
+                                  const SizedBox(height: 16),
+                                  const Text(
+                                    'Live map mirrors the driver when a trip is active.',
+                                    style: TextStyle(color: Colors.white38, fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                  ),
                 ),
-              ),
             ],
           ),
         );

@@ -2,18 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import 'package:intl/intl.dart';
+import '../providers/language_provider.dart';
 
 class WarehouseDashboardScreen extends StatelessWidget {
   const WarehouseDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final langProvider = Provider.of<LanguageProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Warehouse Command Center', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(langProvider.translate('smart_warehouse'), style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         actions: [
+          TextButton.icon(
+            onPressed: () => langProvider.toggleLanguage(),
+            icon: const Icon(Icons.language, color: Colors.white),
+            label: Text(
+              langProvider.isHindi ? 'English' : 'हिंदी',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
@@ -38,17 +48,17 @@ class WarehouseDashboardScreen extends StatelessWidget {
                 // Metrics Row
                 Row(
                   children: [
-                    Expanded(child: _buildMetricCard(context, 'Total Slots', totalSlots.toString(), Icons.warehouse, Colors.blueAccent)),
+                    Expanded(child: _buildMetricCard(context, langProvider.translate('total_slots'), totalSlots.toString(), Icons.warehouse, Colors.blueAccent)),
                     const SizedBox(width: 24),
-                    Expanded(child: _buildMetricCard(context, 'Available Slots', availableSlots.toString(), Icons.check_circle_outline, Colors.greenAccent)),
+                    Expanded(child: _buildMetricCard(context, langProvider.translate('available_slots'), availableSlots.toString(), Icons.check_circle_outline, Colors.greenAccent)),
                     const SizedBox(width: 24),
-                    Expanded(child: _buildMetricCard(context, 'Booked Slots', bookedSlots.toString(), Icons.local_shipping, Colors.purpleAccent)),
+                    Expanded(child: _buildMetricCard(context, langProvider.translate('booked_slots'), bookedSlots.toString(), Icons.local_shipping, Colors.purpleAccent)),
                   ],
                 ),
                 const SizedBox(height: 48),
-                const Text(
-                  'ACTIVE BOOKINGS',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Colors.white54),
+                Text(
+                  langProvider.translate('active_queue'),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Colors.white54),
                 ),
                 const SizedBox(height: 24),
                 Expanded(
@@ -75,13 +85,13 @@ class WarehouseDashboardScreen extends StatelessWidget {
                                 title: Text(slot.truckNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
                                 subtitle: Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text('Type: ${slot.type.toUpperCase()} • Slot: ${slot.dockId}', style: const TextStyle(color: Colors.white54)),
+                                  child: Text('${langProvider.translate('status')}: ${langProvider.translate(slot.type).toUpperCase()} • ${langProvider.translate('slot_number')}: ${slot.dockId}', style: const TextStyle(color: Colors.white54)),
                                 ),
                                 trailing: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    const Text('SLOT TIME', style: TextStyle(fontSize: 10, color: Colors.white38, letterSpacing: 1.0)),
+                                    Text(langProvider.translate('eta'), style: const TextStyle(fontSize: 10, color: Colors.white38, letterSpacing: 1.0)),
                                     const SizedBox(height: 4),
                                     Text(
                                       DateFormat('MMM d, h:mm a').format(slot.slotTime),
