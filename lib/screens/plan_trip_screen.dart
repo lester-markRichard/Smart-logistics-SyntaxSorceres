@@ -3,7 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../models/logistics_models.dart';
-import '../services/gemini_service.dart';
+import '../services/sarvam_service.dart';
 import '../providers/language_provider.dart';
 
 class PlanTripScreen extends StatefulWidget {
@@ -67,7 +67,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
       currentStrategy: '',
     );
 
-    final result = await GeminiService.generatePredictionAndStrategy(
+    final result = await SarvamService.generatePredictionAndStrategy(
       source: _startLocationController.text.trim(),
       destination: _endLocationController.text.trim(),
       truck: vehicle,
@@ -176,7 +176,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                                   : const Icon(Icons.auto_awesome),
                               label: Text(_isLoading
-                                  ? 'Gemini AI Analyzing Route...'
+                                  ? 'Sarvam AI Analyzing Route...'
                                   : (_strategyGenerated ? '✓ Strategy Generated' : langProvider.translate('generate_strategy'))),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).colorScheme.primary,

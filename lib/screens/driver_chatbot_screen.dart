@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/gemini_service.dart';
+import '../services/sarvam_service.dart';
 
 class ChatMessage {
   final String text;
@@ -33,7 +33,7 @@ class _DriverChatbotScreenState extends State<DriverChatbotScreen> {
     _controller.clear();
     _scrollToBottom();
 
-    final response = await GeminiService.sendChatMessage(text);
+    final response = await SarvamService.sendChatMessage(text);
 
     if (mounted) {
       setState(() {

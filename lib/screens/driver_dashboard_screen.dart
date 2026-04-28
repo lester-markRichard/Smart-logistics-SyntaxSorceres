@@ -176,7 +176,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'No planned trip found. Enter a destination and Gemini AI will '  
+              'No planned trip found. Enter a destination and Sarvam AI will '  
               'generate a live strategy when you start navigating.',
               style: TextStyle(color: Colors.white54, height: 1.5),
             ),
@@ -225,7 +225,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
     if (confirmed != true) return;
 
     // Store the quick-start destination in a temporary planned trip so
-    // live_trip_screen can pick it up and call GeminiService itself.
+    // live_trip_screen can pick it up and call SarvamService itself.
     if (vehicle != null) {
       final quickTrip = Trip(
         id: 't_dash_${DateTime.now().millisecondsSinceEpoch}',

@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../providers/language_provider.dart';
 import '../models/logistics_models.dart';
-import '../services/gemini_service.dart';
+import '../services/sarvam_service.dart';
 
 const List<LatLng> _kRoute = [
   LatLng(19.076, 72.877), LatLng(19.065, 72.881), LatLng(19.050, 72.873),
@@ -359,7 +359,7 @@ class _LiveTripScreenState extends State<LiveTripScreen> {
     final user = prov.currentUser;
     final vehicle = prov.vehicles.cast<Vehicle?>().firstWhere(
         (v) => v?.number == user?.truckNumber, orElse: () => null);
-    final result = await GeminiService.generatePredictionAndStrategy(
+    final result = await SarvamService.generatePredictionAndStrategy(
       source: 'Current Location', destination: _destCtrl.text.trim(),
       truck: vehicle ?? Vehicle(id: 'mock', number: 'UNKNOWN', type: VehicleType.truck,
           fuelType: 'Diesel', age: 3, capacity: 20, status: VehicleStatus.active,
